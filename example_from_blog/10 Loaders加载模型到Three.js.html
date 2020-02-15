@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>10 Loaders加载模型到Three.js</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script type="module">
+        import * as THREE from '../node_modules/three/build/three.module.js'
+        import { ObjectLoader } from '../node_modules/three/examples/jsm/loaders/OBJLoader.js'
+        import { GLTFLoader } from '../node_modules/three/examples/jsm/loaders/GLTFLoader.js'
+
+
+        //声明一些全局变量
+        var renderer, camera, scene, geometry, material, mesh, stats;
+
+        function initStats() {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        }
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer();// 实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight);// 设置宽和高
+            document.body.appendChild(renderer.domElement);// 添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene();// 实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);// 实例化相机
+            camera.position.set(0, 0, 15);
+        }
+
+        //创建模型
+        function initMesh() {
+            geometry = new THREE.BoxGeometry(2, 2, 2);// 创建几何体
+            material = new THREE.MeshNormalMaterial();//创建材质
+
+            mesh = new THREE.Mesh(geometry, material);//创建网格
+            scene.add(mesh);// 将网格添加到场景
+        }
+
+        //运行动画
+        function animate() {
+            requestAnimationFrame(animate);//循环调用函数
+
+
+            mesh.rotation.x += 0.01;//每帧网格模型的沿x轴旋转0.01弧度
+            mesh.rotation.y += 0.02;//每帧网格模型的沿y轴旋转0.02弧度
+
+            stats.update();// 更新性能插件
+            renderer.render(scene, camera);//渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initStats();
+
+            console.log(scene.toJSON()); //将整个场景的内容转换成为json对象
+            // console.log(group.toJSON()); //将一个模型组转成json对象
+            console.log(mesh.toJSON()); //将一个模型网格转成json对象
+
+            // 加载外部loader
+            // let loader = new THREE.ObjectLoader(); //实例化ObjectLoader对象
+
+            // //加载模型，并在回调中将生成的模型对象添加到场景中
+            // loader.load("../js/models/json/file.json", function (group) {
+            //     scene.add(group);
+            // });
+
+            var loader = new THREE.GLTFLoader();
+            loader.load('../js/models/gltf/scene.gltf', function (gltf) {
+                gltf.scene.scale.set(.1, .1, .1);
+                scene.add(gltf.scene);
+            });
+
+
+            animate();
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
