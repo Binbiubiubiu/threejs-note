@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Geometry几何体</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script type="module">
+        import * as THREE from '../node_modules/three/build/three.module.js'
+
+        // 1.BufferGeometry转换成Geometry
+        //实例化一个Geometry对象
+        // var geo = new THREE.Geometry();
+        //调用对象的fromBufferGeometry方法，并将需要转换的bufferGeometry传入
+        // geo.fromBufferGeometry(bufferGeometry);
+        //geo为转换转换成的Geometry
+
+        // 2.Geometry转换成BufferGeometry
+        //实例化一个BufferGeometry对象
+        // var bufferGeo = new THREE.BufferGeometry();
+        //调用对象的fromGeometry方法，并将需要转换的geometry传入
+        // bufferGeo.fromGeometry(geometry);
+        //bufferGeo为geometry转换成的BufferGeometry
+
+
+
+        //声明一些全局变量
+        var renderer, camera, scene, geometry, material, mesh, stats;
+
+        function initStats() {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        }
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer();// 实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight);// 设置宽和高
+            document.body.appendChild(renderer.domElement);// 添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene();// 实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);// 实例化相机
+            camera.position.set(0, 0, 15);
+        }
+
+        //创建模型
+        function initMesh() {
+            //BoxGeometry(width : 浮点类型, height : 浮点类型, depth : 浮点类型, widthSegments : 整数类型, heightSegments : 整数类型, depthSegments : 整数类型)
+            // width — 沿x轴的宽度，默认值为1
+            // height — 沿y轴的高度，默认值为1
+            // depth — 沿z轴的深度，默认值为1
+            // widthSegments — 可选，沿着边的宽度的分割面的数量。默认值为1
+            // heightSegments — 可选，沿着边的高度的分割面的数量。默认值为1
+            // depthSegments — 可选，沿着边的深度的分割面的数量。缺省值是1
+            geometry = new THREE.BoxGeometry(2, 2, 2);// 创建几何体
+            material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });//创建材质
+
+            mesh = new THREE.Mesh(geometry, material);//创建网格
+            scene.add(mesh);// 将网格添加到场景
+
+            // CircleGeometry(radius : 浮点类型, segments : 整数类型, thetaStart : 浮点类型, thetaLength : 浮点类型)
+            // radius — 圆的半径，默认值为1
+            // segments — 段数（三角形），最小值为3，默认值为8
+            // thetaStart — 第一段的起始角度，默认值为0
+            // thetaLength — 圆形扇形的中心角，通常称为theta。默认值是2 * Pi，画出一个整圆
+            var geometry = new THREE.CircleGeometry(5, 19);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            var circle = new THREE.Mesh(geometry, material);
+            scene.add(circle);
+
+            // ConeGeometry(radius : 浮点类型, height : 浮点类型, radialSegments : 整数类型, heightSegments : 整数类型, openEnded : 布尔类型, thetaStart : 浮点类型, thetaLength : 浮点类型)
+            // radius — 底部圆锥的半径，默认值为1。
+            // height — 圆锥体的高度，默认值为1。
+            // radialSegments — 圆锥周围的分段面数，默认值为8。
+            // heightSegments — 沿圆锥体高度的面的行数，默认值为1。
+            // openEnded — 圆锥体底部是是隐藏还是显示，默认值为false，显示。
+            // thetaStart — 第一段的起始角度，默认值是0（Three.js的0度位置）。
+            // thetaLength — 圆形扇形的中心角，通常称为theta。默认值是2 * Pi，画出一个整圆
+            var geometry = new THREE.ConeGeometry(5, 20, 32);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            var cone = new THREE.Mesh(geometry, material);
+            scene.add(cone);
+
+            // CylinderGeometry(radiusTop : 浮点类型, radiusBottom : 浮点类型, height : 浮点类型, radialSegments : 整数类型, heightSegments : 整数类型, openEnded : 布尔类型, thetaStart : 浮点类型, thetaLength : 浮点类型)
+            // radiusTop — 顶部圆柱体的半径。默认值为1.
+            // radiusBottom — 底部圆柱体的半径。默认值为1.
+            // height — 圆柱体的高度。默认值为1.
+            // radialSegments — 圆柱周围的分段面数。默认值为8
+            // heightSegments — 沿圆柱体高度的面的行数。默认值为1.
+            // openEnded — 圆柱体的两端是否显示，默认值是false，显示。
+            // thetaStart — 第一段的起始角度，默认值是0（Three.js的0度位置）。
+            // thetaLength — 圆形扇形的中心角，通常称为theta。默认值是2 * Pi，画出一个整圆
+
+            var geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            var cylinder = new THREE.Mesh(geometry, material);
+            scene.add(cylinder);
+
+            // SphereGeometry(radius : 浮点类型, widthSegments : 整数类型, heightSegments : 整数类型, phiStart : 浮点类型, phiLength : 浮点类型, thetaStart : 浮点类型, thetaLength : 浮点类型)
+            // radius — 球体半径。默认值是1
+            // widthSegments — 水平线段的数量。最小值是3，默认值是8
+            // heightSegments — 垂直段的数量。最小值是2，默认值是6
+            // phiStart — 指定水平渲染起始角度。默认值为0
+            // phiLength — 指定水平渲染角度大小。默认值是Math.PI * 2
+            // thetaStart — 指定垂直渲染起始角度。默认值为0
+            // thetaLength — 指定垂直渲染角度大小。默认是Math.PI
+            var geometry = new THREE.SphereGeometry(5, 32, 32);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            var sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+
+            // PlaneGeometry(width : 浮点类型, height : 浮点类型, widthSegments : 整数类型, heightSegments : 整数类型)
+            // width — 沿X轴的宽度。默认值为1
+            // height — 沿着Y轴的高度。默认值为1
+            // widthSegments — 宽度的分段数，可选。默认值为1
+            // heightSegments — 高度的分段数，可选。默认值为1
+            var geometry = new THREE.PlaneGeometry(5, 20, 32);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+            var plane = new THREE.Mesh(geometry, material);
+            scene.add(plane);
+
+            // TorusGeometry(radius : 浮点类型, tube : 浮点类型, radialSegments : 整数类型, tubularSegments : 整数类型, arc : 浮点类型)
+            // radius - 圆环的半径，从圆环的中心到管的中心。默认值为1
+            // tube — 管的半径。默认值是0.4
+            // radialSegments — 横向分段数，默认值是8
+            // tubularSegments — 纵向分段数，默认值是6
+            // arc — 绘制的弧度。默认值是Math.PI * 2，绘制整个圆环
+
+            var geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            var torus = new THREE.Mesh(geometry, material);
+            scene.add(torus);
+
+        }
+
+        //运行动画
+        function animate() {
+            requestAnimationFrame(animate);//循环调用函数
+
+            mesh.rotation.x += 0.01;//每帧网格模型的沿x轴旋转0.01弧度
+            mesh.rotation.y += 0.02;//每帧网格模型的沿y轴旋转0.02弧度
+
+            stats.update();// 更新性能插件
+            renderer.render(scene, camera);//渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initStats();
+
+            animate();
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
