@@ -25,7 +25,7 @@
         import * as THREE from '../node_modules/three/build/three.module.js'
 
         //声明一些全局变量
-        var renderer, camera, scene, geometry, material, mesh, stats;
+        var renderer, camera, scene, geometry, material, mesh, light, stats;
 
         function initStats() {
             stats = new Stats();
@@ -53,14 +53,34 @@
         //创建模型
         function initMesh() {
             geometry = new THREE.BoxGeometry(2, 2, 2);// 创建几何体
-            material = new THREE.MeshNormalMaterial();//创建材质
+            //1.MeshBasicMaterial  这种材质是一种简单的材质，不会受到光的影响，直接看到的效果就是整个物体的颜色都是一样，没有立体的感觉。
+            // material = new THREE.MeshBasicMaterial();//创建材质
+
+            //2.MeshNormalMaterial 这种材质会根据面的方向不同自动改变颜色，也是我们之前一直在用的材质。此材质不受灯光影响。
+            // material = new THREE.MeshNormalMaterial();//创建材质
+
+            //3.LineBasicMaterial线条材质
+            //是由于直线需要单独的材质进行实现，所以我们将直线放到了材质这一节进行讲解
+
+            //4.MeshLambertMaterial 兰伯特材质  这种材质会对光有反应，但是不会出现高光，可以模拟一些粗糙的材质的物体，比如木头或者石头。
+            // material = new THREE.MeshBasicMaterial();//创建材质
+
+            //5.MeshPhongMaterial 高光材质 这种材质具有高光效果，可以模拟一些光滑的物体的材质效果，比如油漆面，瓷瓦等光滑物体。
+            // material = new THREE.MeshPhongMaterial({}); //创建材质
+
+            //6.MeshStandardMaterial 基于物理的渲染（PBR）材质
+            // 这种材质基于物理的渲染（PBR）材质，生成的材质效果更佳，但是相应也占用更多的计算量。这种材质我们可以定义它的粗糙度来确定反光效果，经常用于模拟金属的质感，使金属质感更加真实。
+            material = new THREE.MeshPhongMaterial({ color: 0x00ffff }); //创建材质
+            material.metalness = 0.1; //设置的值的范围为0-1，值越小，材质越光滑，高光越明显
+            material.metalnessMap = 0.1; //设置的值的范围为0-1，值越大，越有生锈金属的质感，值越小反光越清晰
+
             material.needsUpdate = true;
             material.side = THREE.FrontSide;//默认值是THREE.FrontSide, THREE.BackSide,THREE.DoubleSide
             material.transparent = false;
             material.opacity = 1;
-            material.wireframe = true;
-            // var texture = new THREE.TextureLoader().load("textures/water.jpg");
-            // material.map = texture; //将纹理赋值给材质
+            material.wireframe = false;
+            var texture = new THREE.TextureLoader().load("./texture.jpeg");
+            material.map = texture; //将纹理赋值给材质
             // 或者
             // var texture = new THREE.Texture(canvas); //实例化的第一个对象可以是`img`、`canvas`和`video`。
             // material.map = texture; //将纹理赋值给材质
@@ -82,12 +102,22 @@
             renderer.render(scene, camera);//渲染界面
         }
 
+        function initLight() {
+            var light = new THREE.DirectionalLight(0xffffff);// 添加白色的平行光
+            light.position.set(20, 50, 50);
+            scene.add(light);
+
+            // 添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222));
+        }
+
         function init() {
             initRenderer();
             initScene();
             initCamera();
             initMesh();
             initStats();
+            initLight();
 
             animate();
         }

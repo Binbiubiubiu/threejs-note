@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Light光照</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script type="module">
+        import * as THREE from '../node_modules/three/build/three.module.js'
+
+        //声明一些全局变量
+        var renderer, camera, scene, geometry, material, mesh, stats;
+
+        function initStats() {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        }
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer();// 实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight);// 设置宽和高
+            document.body.appendChild(renderer.domElement);// 添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene();// 实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);// 实例化相机
+            camera.position.set(0, 0, 15);
+        }
+
+        //创建模型
+        function initMesh() {
+            geometry = new THREE.BoxGeometry(2, 2, 2);// 创建几何体
+            material = new THREE.MeshNormalMaterial();//创建材质
+
+            mesh = new THREE.Mesh(geometry, material);//创建网格
+            scene.add(mesh);// 将网格添加到场景
+        }
+
+        //运行动画
+        function animate() {
+            requestAnimationFrame(animate);//循环调用函数
+
+            mesh.rotation.x += 0.01;//每帧网格模型的沿x轴旋转0.01弧度
+            mesh.rotation.y += 0.02;//每帧网格模型的沿y轴旋转0.02弧度
+
+            stats.update();// 更新性能插件
+            renderer.render(scene, camera);//渲染界面
+        }
+
+        // 初始化光照
+        function initLight() {
+            //1.AmbientLight 环境全局光  环境光会照亮场景中所有的物体，在计算物体的颜色的时候，都会叠加上环境光的颜色。
+            scene.add(new THREE.AmbientLight(0x222222));
+            //2.DirectionalLight平衡光  平行光是以特定的方向发射的光。它产生的光都是平行的状态，主要用于模拟太阳光线。
+            var directionalLight = new THREE.DirectionalLight(0xffffff);//添加了一个白色的平行光
+            directionalLight.position.set(20, 50, 50);
+            directionalLight.target = new THREE.Vector3(0, 0, 0);//设置当前的平行光的朝向位置
+            directionalLight.color.set(0x000000); //将光照的颜色修改为黑色
+            directionalLight.intensity = 2.0; // 光照的强度改为默认的两倍
+            scene.add(directionalLight)
+
+            //添加阴影效果
+            directionalLight.castShadow = true; // 设置平行光投射投影
+            renderer.shadowMap.enabled = true;
+
+            geometry.castShadow = true;
+
+            // cube.castShadow = true; //开启阴影
+            // scene.add(cube);
+
+            // plane.receiveShadow = true; //可以接收阴影
+            // scene.add(plane);
+
+
+            directionalLight.shadow.camera.near = 20; //产生阴影的最近距离
+            directionalLight.shadow.camera.far = 100; //产生阴影的最远距离
+            directionalLight.shadow.camera.left = -50; //产生阴影距离位置的最左边位置
+            directionalLight.shadow.camera.right = 50; //最右边
+            directionalLight.shadow.camera.top = 50; //最上边
+            directionalLight.shadow.camera.bottom = -50; //最下面
+
+            //这两个值决定生成阴影密度 默认512
+            directionalLight.shadow.mapSize.height = 1024;
+            directionalLight.shadow.mapSize.width = 1024;
+
+            //3. PointLight 点光源
+            var pointLight = new THREE.PointLight(0xff0000); //创建一个白色的点光源
+            pointLight.position.set(50, 50, 50);
+            pointLight.color.set(0x000000); //修改光照颜色
+            pointLight.intensity = 0.5; //修改光的强度
+            pointLight.distance = 50; //修改光的照射范围
+            pointLight.decay = 1.0; //修改衰减度
+            scene.add(pointLight);
+
+            //4.SpotLight 聚光灯光源 然后沿着一个一个圆锥体进行照射，可以模仿手电筒，带有灯罩的灯泡等效果。
+            var spotLight = new THREE.SpotLight(0xffffff); //创建一个白色光照
+            spotLight.position.set(100, 1000, 100);
+            scene.add(spotLight);
+
+            spotLight.color.set(0x000000); //修改光照颜色
+            spotLight.intensity = 0.5; //修改光的强度
+            spotLight.distance = 50; //修改光的照射范围
+            spotLight.angle = Math.PI / 3; //修改光的照射弧度
+            spotLight.penumbra = 1.0; //修改交界过渡
+            spotLight.decay = 1.0; //修改衰减度
+
+            //5. HemisphereLight室外光源 最后我们说一下室外光源，这个光源主要是为了模拟在户外的环境光效果，比如在蓝天绿地的户外，
+            //添加户外光源
+            var hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+            scene.add(hemisphereLight);
+
+            hemisphereLight.color.set(0xffffff); //将天空颜色修改为白色
+            hemisphereLight.groundColor.set(0x000000); //将地面颜色修改为黑色
+
+            // 我们也可以修改position配置项来修改渲染的方向：
+            hemisphereLight.position.set(0, -1, 0); //默认从上往下渲染，也就是天空在上方，当前修改为了，天空颜色从下往上渲染
+
+
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initStats();
+            initLight();
+
+            animate();
+        }
+
+        init()
+    </script>
+</body>
+
+</html>

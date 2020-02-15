@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Points 粒子</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script type="module">
+        import * as THREE from '../node_modules/three/build/three.module.js'
+
+        //声明一些全局变量
+        var renderer, camera, scene, geometry, material, mesh, stats;
+
+        function initStats() {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        }
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer();// 实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight);// 设置宽和高
+            document.body.appendChild(renderer.domElement);// 添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene();// 实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);// 实例化相机
+            camera.position.set(0, 0, 15);
+        }
+
+        //创建模型
+        function initMesh() {
+            // var spriteMaterial = new THREE.SpriteMaterial({ color: 0xffffff });
+            // var sprite = new THREE.Sprite(spriteMaterial);
+            // scene.add(sprite);
+
+
+            // var spriteMap = new THREE.TextureLoader().load("sprite.png");
+            // var spriteMaterial = new THREE.SpriteMaterial({ map: spriteMap, color: 0xffffff });
+            // var sprite = new THREE.Sprite(spriteMaterial);
+            // scene.add(sprite);
+
+            //球体
+            var sphereGeometry = new THREE.SphereGeometry(5, 24, 16);
+            var sphereMaterial = new THREE.PointsMaterial({ color: 0xff00ff });
+            var sphere = new THREE.Points(sphereGeometry, sphereMaterial);
+            scene.add(sphere);
+
+            var starsGeometry = new THREE.Geometry();
+            //生成一万个点的位置
+            for (var i = 0; i < 10000; i++) {
+                var star = new THREE.Vector3();
+                //THREE.Math.randFloatSpread 在区间内随机浮动* - 范围 / 2 *到* 范围 / 2 *内随机取值。
+                star.x = THREE.Math.randFloatSpread(2000);
+                star.y = THREE.Math.randFloatSpread(2000);
+                star.z = THREE.Math.randFloatSpread(2000);
+                starsGeometry.vertices.push(star);
+            }
+            var starsMaterial = new THREE.PointsMaterial({ color: 0x888888 });
+            var starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
+
+
+        }
+
+        //运行动画
+        function animate() {
+            requestAnimationFrame(animate);//循环调用函数
+
+
+            stats.update();// 更新性能插件
+            renderer.render(scene, camera);//渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initStats();
+
+            animate();
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
